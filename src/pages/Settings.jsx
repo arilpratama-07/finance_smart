@@ -1,5 +1,6 @@
-import { Shield, Bell, Moon, Globe, Database, Lock, ChevronRight, User, Smartphone } from 'lucide-react';
+import { Shield, Bell, Moon, Globe, Database, Lock, ChevronRight, User, Smartphone, X } from 'lucide-react';
 import { useStore } from '../store';
+import { useState } from 'react';
 
 const Section = ({ title, children }) => (
   <div className="card" style={{marginBottom:20}}>
@@ -8,8 +9,8 @@ const Section = ({ title, children }) => (
   </div>
 );
 
-const SettingRow = ({ icon: Icon, label, desc, right, color='var(--text-secondary)' }) => (
-  <div style={{display:'flex', alignItems:'center', gap:14, padding:'14px 0', borderBottom:'1px solid rgba(255,255,255,0.04)'}}>
+const SettingRow = ({ icon: Icon, label, desc, right, color='var(--text-secondary)', onClick }) => (
+  <div onClick={onClick} style={{display:'flex', alignItems:'center', gap:14, padding:'14px 0', borderBottom:'1px solid rgba(255,255,255,0.04)', cursor: onClick ? 'pointer' : 'default'}}>
     <div style={{width:38, height:38, borderRadius:10, background:`rgba(59,130,246,0.1)`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>
       <Icon size={18} color={color}/>
     </div>
@@ -35,7 +36,26 @@ const Toggle = ({ on, onClick }) => (
 );
 
 export default function Settings() {
-  const { theme, toggleTheme } = useStore();
+  const { theme, toggleTheme, user, updateUser } = useStore();
+  const [showEditProfile, setShowEditProfile] = useState(false);
+  const [showEditPassword, setShowEditPassword] = useState(false);
+  const [profileForm, setProfileForm] = useState({ name: user?.name || '', email: user?.email || '' });
+  const [pwdForm, setPwdForm] = useState({ old: '', new: '' });
+
+  const handleSaveProfile = (e) => {
+    e.preventDefault();
+    updateUser(profileForm);
+    setShowEditProfile(false);
+    alert('Profil berhasil diperbarui!');
+  };
+
+  const handleSavePassword = (e) => {
+    e.preventDefault();
+    setShowEditPassword(false);
+    setPwdForm({ old: '', new: '' });
+    alert('Kata sandi berhasil diperbarui!');
+  };
+
   return (
     <div className="page-container">
       <div className="page-header">
@@ -45,19 +65,73 @@ export default function Settings() {
         </div>
       </div>
 
+      {showEditProfile && (
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowEditProfile(false)}>
+          <div className="modal">
+            <div className="modal-header">
+              <div className="modal-title">Edit Profil</div>
+              <button className="btn btn-secondary btn-icon btn-sm" onClick={() => setShowEditProfile(false)}><X size={16}/></button>
+            </div>
+            <form onSubmit={handleSaveProfile}>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label className="form-label">Nama Lengkap</label>
+                  <input className="form-control" value={profileForm.name} onChange={e => setProfileForm({...profileForm, name: e.target.value})} required/>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Alamat Email</label>
+                  <input type="email" className="form-control" value={profileForm.email} onChange={e => setProfileForm({...profileForm, email: e.target.value})} required/>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowEditProfile(false)}>Batal</button>
+                <button type="submit" className="btn btn-primary">Simpan Profil</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showEditPassword && (
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowEditPassword(false)}>
+          <div className="modal">
+            <div className="modal-header">
+              <div className="modal-title">Ubah Password</div>
+              <button className="btn btn-secondary btn-icon btn-sm" onClick={() => setShowEditPassword(false)}><X size={16}/></button>
+            </div>
+            <form onSubmit={handleSavePassword}>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label className="form-label">Password Lama</label>
+                  <input type="password" className="form-control" value={pwdForm.old} onChange={e => setPwdForm({...pwdForm, old: e.target.value})} required/>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Password Baru</label>
+                  <input type="password" className="form-control" value={pwdForm.new} onChange={e => setPwdForm({...pwdForm, new: e.target.value})} required/>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowEditPassword(false)}>Batal</button>
+                <button type="submit" className="btn btn-primary">Ubah Password</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <div className="grid-2">
         <div>
           <Section title="Profil Pengguna">
             <div style={{display:'flex', alignItems:'center', gap:14, padding:'16px', background:'var(--bg-primary)', borderRadius:'var(--radius)', marginBottom:14}}>
-              <div style={{width:56, height:56, borderRadius:'50%', background:'linear-gradient(135deg, var(--purple), var(--blue))', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, fontWeight:700, color:'white'}}>A</div>
+              <div style={{width:56, height:56, borderRadius:'50%', background:'linear-gradient(135deg, var(--purple), var(--blue))', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, fontWeight:700, color:'white'}}>{user?.name ? user.name[0].toUpperCase() : 'U'}</div>
               <div>
-                <div style={{fontWeight:700, fontSize:16}}>Ahmad Fauzi</div>
-                <div style={{fontSize:13, color:'var(--text-muted)'}}>ahmad@finansmart.id</div>
+                <div style={{fontWeight:700, fontSize:16}}>{user?.name || 'User'}</div>
+                <div style={{fontSize:13, color:'var(--text-muted)'}}>{user?.email || 'user@example.com'}</div>
                 <span className="badge badge-green" style={{marginTop:6}}>Premium</span>
               </div>
             </div>
-            <SettingRow icon={User} label="Edit Profil" desc="Ubah nama, email, dan foto profil" right={<ChevronRight size={16} color="var(--text-muted)"/>}/>
-            <SettingRow icon={Lock} label="Ubah Password" desc="Perbarui kata sandi akun Anda" right={<ChevronRight size={16} color="var(--text-muted)"/>}/>
+            <SettingRow onClick={() => setShowEditProfile(true)} icon={User} label="Edit Profil" desc="Ubah nama, email, dan foto profil" right={<ChevronRight size={16} color="var(--text-muted)"/>}/>
+            <SettingRow onClick={() => setShowEditPassword(true)} icon={Lock} label="Ubah Password" desc="Perbarui kata sandi akun Anda" right={<ChevronRight size={16} color="var(--text-muted)"/>}/>
             <SettingRow icon={Smartphone} label="Autentikasi Dua Faktor" desc="Aktif — Menggunakan Google Authenticator" right={<Toggle on={true}/>} color="var(--green)"/>
           </Section>
 

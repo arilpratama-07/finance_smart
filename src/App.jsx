@@ -12,6 +12,7 @@ import Accounts from './pages/Accounts';
 import Scheduled from './pages/Scheduled';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import Auth from './pages/Auth';
 
 const pages = {
   dashboard: Dashboard,
@@ -25,7 +26,7 @@ const pages = {
 };
 
 export default function App() {
-  const { activePage, theme } = useStore();
+  const { activePage, theme, isAuthenticated } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const Page = pages[activePage] || Dashboard;
 
@@ -35,6 +36,10 @@ export default function App() {
 
   const closeSidebar = () => setSidebarOpen(false);
   const toggleSidebar = () => setSidebarOpen(v => !v);
+
+  if (!isAuthenticated) {
+    return <Auth />;
+  }
 
   return (
     <div className="app-layout">

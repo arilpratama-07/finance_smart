@@ -24,7 +24,7 @@ const sections = [
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
-  const { activePage, setPage, accounts } = useStore();
+  const { activePage, setPage, accounts, logout, user } = useStore();
   const totalBalance = accounts.reduce((s, a) => s + a.balance, 0);
 
   const navigate = (page) => {
@@ -80,12 +80,12 @@ export default function Sidebar({ isOpen, onClose }) {
           <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>End-to-End Encrypted</span>
         </div>
         <div className="user-profile">
-          <div className="user-avatar">A</div>
+          <div className="user-avatar">{user?.name ? user.name[0].toUpperCase() : 'U'}</div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div className="user-name">Ahmad Fauzi</div>
-            <div className="user-email">ahmad@finansmart.id</div>
+            <div className="user-name">{user?.name || 'User'}</div>
+            <div className="user-email">{user?.email || 'user@example.com'}</div>
           </div>
-          <LogOut size={15} color="var(--text-muted)" style={{ cursor: 'pointer', flexShrink: 0 }} />
+          <LogOut onClick={logout} size={15} color="var(--text-muted)" style={{ cursor: 'pointer', flexShrink: 0 }} />
         </div>
       </div>
     </aside>

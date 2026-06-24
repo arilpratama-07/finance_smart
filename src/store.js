@@ -108,12 +108,17 @@ export const useStore = create((set, get) => ({
   activeTab: 'all',
   currency: 'IDR',
   theme: 'dark',
+  isAuthenticated: false,
+  user: null,
 
   // Navigation
   setPage: (page) => set({ activePage: page }),
   openModal: (modal, item = null) => set({ modalOpen: modal, editingItem: item }),
   closeModal: () => set({ modalOpen: null, editingItem: null }),
   toggleTheme: () => set(s => ({ theme: s.theme === 'dark' ? 'light' : 'dark' })),
+  login: (user) => set({ isAuthenticated: true, user }),
+  logout: () => set({ isAuthenticated: false, user: null }),
+  updateUser: (data) => set(s => ({ user: { ...s.user, ...data } })),
 
   // Transactions
   addTransaction: (tx) => set(s => ({

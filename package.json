@@ -13,7 +13,9 @@
     "vite": "^8.1.0"
   },
   "dependencies": {
+    "@dataconnect/generated": "file:src/dataconnect-generated",
     "date-fns": "^4.4.0",
+    "firebase": "^12.15.0",
     "lucide-react": "^1.21.0",
     "recharts": "^3.9.0",
     "zustand": "^5.0.14"
